@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('postal_codes', function (Blueprint $table) {
             $table->id();
+            $table->string('zip', 10)->index();
+            $table->string('city');
+            $table->string('county')->nullable();
             $table->timestamps();
+            $table->unique(['zip', 'city']);
         });
     }
 

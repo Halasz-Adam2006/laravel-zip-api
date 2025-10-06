@@ -9,7 +9,6 @@ class Iranyitoszamok extends Model
     protected $filable = [
         'zip',
         'city',
-        'city_normalized',
         'county',
         'district'
     ];
