@@ -20,35 +20,59 @@ class PostalCodeController extends Controller
      */
     public function store(Request $request)
     {
-        // Implement the logic to store a new postal code
+        $validated = $request->validate([
+        'zip' => 'required|string',
+        'city' => 'required|string',
+        'county' => 'required|string',
+    ]);
+
+    $postalCode = PostalCode::create($validated);
+    
+    return response()->json($postalCode, 201);
+    
+}
+
+public function destroy(string $id)
+{
+    
+    $postalCode = PostalCode::where('zip', $id)->first();
+    
+    if ($postalCode) {
+        $postalCode->delete();
+        return response()->json(['message' => 'Postal code deleted successfully'], 204);
+    } else {
+        return response()->json(['message' => 'Postal code not found'], 404);
     }
+}
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
+
+public function show(string $id)
+{
+    
+    $postalCodes = PostalCode::where('zip', $id)->get();
         
-        $postalCodes = PostalCode::where('zip', $id)->get();
+    
+    return response()->json($postalCodes);
+}
 
 
-        
-        return response()->json($postalCodes);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
-        // You can implement the logic to update a postal code
+        $validated = $request->validate([
+            'zip' => 'sometimes|required|string',
+            'city' => 'sometimes|required|string',
+            'county' => 'sometimes|required|string',
+        ]);
+
+        $postalCode = PostalCode::where('zip', $id)->first();
+
+        if ($postalCode) {
+            $postalCode->update($validated);
+            return response()->json($postalCode);
+        } else {
+            return response()->json(['message' => 'Postal code not found'], 404);
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        // You can implement the logic to delete a postal code
-    }
+
 }
