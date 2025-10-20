@@ -42,7 +42,7 @@ class ImportPostalCodes extends Command
                 continue;
             }
 
-            \App\Models\PostalCode::create([
+            PostalCode::create([
                 'zip'    => $row['Irányítószám'],
                 'city'   => $row['Település'] ?? null,
                 'county' => $row['Megye'] ?? null,
