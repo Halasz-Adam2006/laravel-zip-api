@@ -18,16 +18,18 @@ class ImportPostalCodes extends Command
             $this->error("File not found: $path");
             return;
         }
+        
+        $total = max(0, count(file($path)) - 1);
 
         $handle = fopen($path, 'r');
         $header = fgetcsv($handle, 1000, ',');
         $header = array_map(function($h) {
             return trim($h, "\" \t\n\r\0\x0B");
         }, $header);
-        $this->info('CSV Header: ' . json_encode($header));
 
-        // Import all rows
-        $count = 0;
+        $bar = $this->output->createProgressBar($total);
+        $bar->start();
+
         while (($data = fgetcsv($handle, 1000, ',')) !== false) {
             $data = array_map(function($d) {
                 return trim($d, "\" \t\n\r\0\x0B");
@@ -35,20 +37,24 @@ class ImportPostalCodes extends Command
 
             $row = array_combine($header, $data);
 
-            // Skip rows with missing zip
             if (empty($row['Irányítószám'])) {
+                $bar->advance();
                 continue;
             }
 
-            PostalCode::create([
+            \App\Models\PostalCode::create([
                 'zip'    => $row['Irányítószám'],
                 'city'   => $row['Település'] ?? null,
                 'county' => $row['Megye'] ?? null,
             ]);
-            $count++;
+
+            $bar->advance();
         }
+
         fclose($handle);
-        $this->info("Import completed. Imported $count rows.");
+        $bar->finish();
+        $this->newLine();
+        $this->info('Import completed.');
     }
 }
 

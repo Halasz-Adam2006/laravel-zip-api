@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $this->command->info('Starting postal codes import…');
 
-        $path = storage_path('storage/app/iranyitoszamok.xlsx');
+        $path = storage_path('storage/app/iranyitoszamok.csv');
         Artisan::call('import:postal-codes', ['path' => $path]);
 
         $this->command->info('Postal codes import finished.');
