@@ -1,0 +1,632 @@
+name: 'Postal Codes'
+description: ''
+endpoints:
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: api/postal-codes
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get all postal codes.'
+      description: 'Returns a list of all postal codes with their associated county information.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          [{
+            "id": 1,
+            "zip": "1011",
+            "city": "Budapest",
+            "county_id": 1,
+            "county": {
+              "id": 1,
+              "name": "Budapest"
+            },
+            "created_at": "2025-01-01T00:00:00.000000Z",
+            "updated_at": "2025-01-01T00:00:00.000000Z"
+          }]
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/postal-codes/{postal_code}'
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get postal codes by zip.'
+      description: 'Returns all postal codes matching the given zip value.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      postal_code:
+        custom: []
+        name: postal_code
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id:
+        custom: []
+        name: id
+        description: 'The zip code.'
+        required: true
+        example: '1011'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      postal_code: architecto
+      id: '1011'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          [{
+            "id": 1,
+            "zip": "1011",
+            "city": "Budapest",
+            "county_id": 1,
+            "county": {
+              "id": 1,
+              "name": "Budapest"
+            },
+            "created_at": "2025-01-01T00:00:00.000000Z",
+            "updated_at": "2025-01-01T00:00:00.000000Z"
+          }]
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - POST
+    uri: api/postal-codes
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Create a new postal code.'
+      description: "Creates a new postal code record. If the county doesn't exist, it will be created automatically."
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters: []
+    cleanUrlParameters: []
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      zip:
+        custom: []
+        name: zip
+        description: 'The postal code (zip).'
+        required: true
+        example: '1011'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      city:
+        custom: []
+        name: city
+        description: 'The city name.'
+        required: true
+        example: Budapest
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      county:
+        custom: []
+        name: county
+        description: 'The county name.'
+        required: true
+        example: Budapest
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      zip: '1011'
+      city: Budapest
+      county: Budapest
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 201
+        content: |-
+          {
+            "id": 1,
+            "zip": "1011",
+            "city": "Budapest",
+            "county_id": 1,
+            "county": {
+              "id": 1,
+              "name": "Budapest"
+            },
+            "created_at": "2025-01-01T00:00:00.000000Z",
+            "updated_at": "2025-01-01T00:00:00.000000Z"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/postal-codes/{postal_code}'
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update a postal code by zip.'
+      description: 'Updates the first postal code matching the given zip value. All fields are optional.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      postal_code:
+        custom: []
+        name: postal_code
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id:
+        custom: []
+        name: id
+        description: 'The zip code to update.'
+        required: true
+        example: '1011'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      postal_code: architecto
+      id: '1011'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      zip:
+        custom: []
+        name: zip
+        description: 'optional New zip code.'
+        required: false
+        example: '1012'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      city:
+        custom: []
+        name: city
+        description: 'optional New city name.'
+        required: false
+        example: Budapest
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      county:
+        custom: []
+        name: county
+        description: 'optional New county name.'
+        required: false
+        example: Pest
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      zip: '1012'
+      city: Budapest
+      county: Pest
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "id": 1,
+            "zip": "1012",
+            "city": "Budapest",
+            "county_id": 1,
+            "county": {
+              "id": 1,
+              "name": "Budapest"
+            },
+            "created_at": "2025-01-01T00:00:00.000000Z",
+            "updated_at": "2025-01-01T00:00:00.000000Z"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Postal code not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/postal-codes/{postal_code}'
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete a postal code by zip.'
+      description: 'Deletes the first postal code matching the given zip value.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      postal_code:
+        custom: []
+        name: postal_code
+        description: ''
+        required: true
+        example: architecto
+        type: string
+        enumValues: []
+        exampleWasSpecified: false
+        nullable: false
+        deprecated: false
+      id:
+        custom: []
+        name: id
+        description: 'The zip code.'
+        required: true
+        example: '1011'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      postal_code: architecto
+      id: '1011'
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: 'Deleted successfully'
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Postal code not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - GET
+    uri: 'api/id/{id}'
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Get a postal code by ID.'
+      description: 'Returns a single postal code by its database ID.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The database ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "id": 1,
+            "zip": "1011",
+            "city": "Budapest",
+            "county_id": 1,
+            "county": {
+              "id": 1,
+              "name": "Budapest"
+            },
+            "created_at": "2025-01-01T00:00:00.000000Z",
+            "updated_at": "2025-01-01T00:00:00.000000Z"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Postal code not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - PUT
+    uri: 'api/id/{id}'
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Update a postal code by ID.'
+      description: 'Updates a postal code by its database ID. All fields are optional.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The database ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters:
+      zip:
+        custom: []
+        name: zip
+        description: 'optional New zip code.'
+        required: false
+        example: '1012'
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      city:
+        custom: []
+        name: city
+        description: 'optional New city name.'
+        required: false
+        example: Budapest
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+      county:
+        custom: []
+        name: county
+        description: 'optional New county name.'
+        required: false
+        example: Pest
+        type: string
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanBodyParameters:
+      zip: '1012'
+      city: Budapest
+      county: Pest
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 200
+        content: |-
+          {
+            "id": 1,
+            "zip": "1012",
+            "city": "Budapest",
+            "county_id": 1,
+            "county": {
+              "id": 1,
+              "name": "Budapest"
+            },
+            "created_at": "2025-01-01T00:00:00.000000Z",
+            "updated_at": "2025-01-01T00:00:00.000000Z"
+          }
+        headers: []
+        description: ''
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Postal code not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null
+  -
+    custom: []
+    httpMethods:
+      - DELETE
+    uri: 'api/id/{id}'
+    metadata:
+      custom: []
+      groupName: 'Postal Codes'
+      groupDescription: ''
+      subgroup: ''
+      subgroupDescription: ''
+      title: 'Delete a postal code by ID.'
+      description: 'Deletes a postal code by its database ID.'
+      authenticated: true
+      deprecated: false
+    headers:
+      Content-Type: application/json
+      Accept: application/json
+    urlParameters:
+      id:
+        custom: []
+        name: id
+        description: 'The database ID.'
+        required: true
+        example: 1
+        type: integer
+        enumValues: []
+        exampleWasSpecified: true
+        nullable: false
+        deprecated: false
+    cleanUrlParameters:
+      id: 1
+    queryParameters: []
+    cleanQueryParameters: []
+    bodyParameters: []
+    cleanBodyParameters: []
+    fileParameters: []
+    responses:
+      -
+        custom: []
+        status: 204
+        content: ''
+        headers: []
+        description: 'Deleted successfully'
+      -
+        custom: []
+        status: 404
+        content: |-
+          {
+            "message": "Postal code not found"
+          }
+        headers: []
+        description: ''
+    responseFields: []
+    auth: []
+    controller: null
+    method: null
+    route: null

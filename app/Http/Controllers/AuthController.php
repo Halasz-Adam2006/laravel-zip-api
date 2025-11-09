@@ -9,6 +9,22 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+    /**
+     * Login user.
+     *
+     * Authenticates a user and returns an access token.
+     *
+     * @group Authentication
+     * @unauthenticated
+     * @bodyParam email string required User email address. Example: user@example.com
+     * @bodyParam password string required User password. Example: password123
+     * @response 200 {
+     *   "token": "1|abcdefghijklmnopqrstuvwxyz1234567890"
+     * }
+     * @response 401 {
+     *   "message": "Invalid credentials"
+     * }
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -26,6 +42,27 @@ class AuthController extends Controller
         return response()->json(['token' => $token]);
     }
 
+    /**
+     * Register a new user.
+     *
+     * Creates a new user account and returns an access token.
+     *
+     * @group Authentication
+     * @unauthenticated
+     * @bodyParam name string required User's full name. Example: John Doe
+     * @bodyParam email string required User email address. Example: user@example.com
+     * @bodyParam password string required User password. Example: password123
+     * @response 201 {
+     *   "user": {
+     *     "id": 1,
+     *     "name": "John Doe",
+     *     "email": "user@example.com",
+     *     "created_at": "2025-01-01T00:00:00.000000Z",
+     *     "updated_at": "2025-01-01T00:00:00.000000Z"
+     *   },
+     *   "token": "1|abcdefghijklmnopqrstuvwxyz1234567890"
+     * }
+     */
     public function register(Request $request)
     {
         $validated = $request->validate([
