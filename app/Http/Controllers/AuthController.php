@@ -47,4 +47,6 @@ class AuthController extends Controller
             'token' => $token,
         ], 201);
     }
+
+
 }

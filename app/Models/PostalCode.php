@@ -9,6 +9,11 @@ class PostalCode extends Model
     protected $fillable = [
         'zip',
         'city',
-        'county',
+        'county_id',
     ];
+
+    public function county()
+    {
+        return $this->belongsTo(County::class);
+    }
 }

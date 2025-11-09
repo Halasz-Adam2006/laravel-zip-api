@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\PostalCode;
+use App\Models\County;
 
 class PostalCodeController extends Controller
 {
-
-
+    public function index()
+    {
+        $postalCodes = PostalCode::with('county')->get();
+        return response()->json($postalCodes);
+    }
 
     public function store(Request $request)
     {
@@ -18,7 +22,17 @@ class PostalCodeController extends Controller
             'county' => 'required|string',
         ]);
 
-        $postalCode = PostalCode::create($validated);
+        // Find or create the county
+        $county = County::firstOrCreate(['name' => $validated['county']]);
+
+        $postalCode = PostalCode::create([
+            'zip' => $validated['zip'],
+            'city' => $validated['city'],
+            'county_id' => $county->id,
+        ]);
+
+        // Load the county relationship for the response
+        $postalCode->load('county');
 
         return response()->json($postalCode, 201);
     }
@@ -37,7 +51,7 @@ class PostalCodeController extends Controller
 
     public function show(string $id)
     {
-        $postalCodes = PostalCode::where('zip', $id)->get();
+        $postalCodes = PostalCode::with('county')->where('zip', $id)->get();
 
         return response()->json($postalCodes);
     }
@@ -52,17 +66,33 @@ class PostalCodeController extends Controller
 
         $postalCode = PostalCode::where('zip', $id)->first();
 
-        if ($postalCode) {
-            $postalCode->update($validated);
-            return response()->json($postalCode);
-        } else {
+        if (!$postalCode) {
             return response()->json(['message' => 'Postal code not found'], 404);
         }
+
+        // Update county if provided
+        if (isset($validated['county'])) {
+            $county = County::firstOrCreate(['name' => $validated['county']]);
+            $postalCode->county_id = $county->id;
+        }
+
+        if (isset($validated['zip'])) {
+            $postalCode->zip = $validated['zip'];
+        }
+        
+        if (isset($validated['city'])) {
+            $postalCode->city = $validated['city'];
+        }
+
+        $postalCode->save();
+        $postalCode->load('county');
+
+        return response()->json($postalCode);
     }
 
     public function showById(int $id)
     {
-        $postalCode = PostalCode::find($id);
+        $postalCode = PostalCode::with('county')->find($id);
 
         if ($postalCode) {
             return response()->json($postalCode);
@@ -93,17 +123,33 @@ class PostalCodeController extends Controller
 
         $postalCode = PostalCode::find($id);
 
-        if ($postalCode) {
-            $postalCode->update($validated);
-            return response()->json($postalCode);
+        if (!$postalCode) {
+            return response()->json(['message' => 'Postal code not found'], 404);
         }
 
-        return response()->json(['message' => 'Postal code not found'], 404);
+        // Update county if provided
+        if (isset($validated['county'])) {
+            $county = County::firstOrCreate(['name' => $validated['county']]);
+            $postalCode->county_id = $county->id;
+        }
+
+        if (isset($validated['zip'])) {
+            $postalCode->zip = $validated['zip'];
+        }
+        
+        if (isset($validated['city'])) {
+            $postalCode->city = $validated['city'];
+        }
+
+        $postalCode->save();
+        $postalCode->load('county');
+
+        return response()->json($postalCode);
     }
 
     public function showByCity(string $city)
     {
-        $postalCodes = PostalCode::where('city', $city)->get();
+        $postalCodes = PostalCode::with('county')->where('city', $city)->get();
 
         return response()->json($postalCodes);
     }
@@ -127,27 +173,59 @@ class PostalCodeController extends Controller
             'county' => 'sometimes|required|string',
         ]);
 
-        $affected = PostalCode::where('city', $city)->update($validated);
+        $postalCodes = PostalCode::where('city', $city)->get();
 
-        if ($affected) {
-            $updated = PostalCode::where('city', $validated['city'] ?? $city)->get();
-            return response()->json($updated);
+        if ($postalCodes->isEmpty()) {
+            return response()->json(['message' => 'Postal codes not found for given city'], 404);
         }
 
-        return response()->json(['message' => 'Postal codes not found for given city'], 404);
+        // Update county if provided
+        $countyId = null;
+        if (isset($validated['county'])) {
+            $county = County::firstOrCreate(['name' => $validated['county']]);
+            $countyId = $county->id;
+        }
+
+        foreach ($postalCodes as $postalCode) {
+            if ($countyId) {
+                $postalCode->county_id = $countyId;
+            }
+            if (isset($validated['zip'])) {
+                $postalCode->zip = $validated['zip'];
+            }
+            if (isset($validated['city'])) {
+                $postalCode->city = $validated['city'];
+            }
+            $postalCode->save();
+        }
+
+        $updated = PostalCode::with('county')->where('city', $validated['city'] ?? $city)->get();
+        return response()->json($updated);
     }
 
 
     public function showByCounty(string $county)
     {
-        $postalCodes = PostalCode::where('county', $county)->get();
+        $countyModel = County::where('name', $county)->first();
+        
+        if (!$countyModel) {
+            return response()->json([]);
+        }
+
+        $postalCodes = PostalCode::with('county')->where('county_id', $countyModel->id)->get();
 
         return response()->json($postalCodes);
     }
 
     public function destroyByCounty(string $county)
     {
-        $deleted = PostalCode::where('county', $county)->delete();
+        $countyModel = County::where('name', $county)->first();
+        
+        if (!$countyModel) {
+            return response()->json(['message' => 'Postal codes not found for given county'], 404);
+        }
+
+        $deleted = PostalCode::where('county_id', $countyModel->id)->delete();
 
         if ($deleted) {
             return response()->json(null, 204);
@@ -164,13 +242,40 @@ class PostalCodeController extends Controller
             'county' => 'sometimes|required|string',
         ]);
 
-        $affected = PostalCode::where('county', $county)->update($validated);
-
-        if ($affected) {
-            $updated = PostalCode::where('county', $validated['county'] ?? $county)->get();
-            return response()->json($updated);
+        $countyModel = County::where('name', $county)->first();
+        
+        if (!$countyModel) {
+            return response()->json(['message' => 'Postal codes not found for given county'], 404);
         }
 
-        return response()->json(['message' => 'Postal codes not found for given county'], 404);
+        $postalCodes = PostalCode::where('county_id', $countyModel->id)->get();
+
+        if ($postalCodes->isEmpty()) {
+            return response()->json(['message' => 'Postal codes not found for given county'], 404);
+        }
+
+        // Update county if provided
+        $newCountyId = null;
+        if (isset($validated['county'])) {
+            $newCounty = County::firstOrCreate(['name' => $validated['county']]);
+            $newCountyId = $newCounty->id;
+        }
+
+        foreach ($postalCodes as $postalCode) {
+            if ($newCountyId) {
+                $postalCode->county_id = $newCountyId;
+            }
+            if (isset($validated['zip'])) {
+                $postalCode->zip = $validated['zip'];
+            }
+            if (isset($validated['city'])) {
+                $postalCode->city = $validated['city'];
+            }
+            $postalCode->save();
+        }
+
+        $targetCountyId = $newCountyId ?? $countyModel->id;
+        $updated = PostalCode::with('county')->where('county_id', $targetCountyId)->get();
+        return response()->json($updated);
     }
 }

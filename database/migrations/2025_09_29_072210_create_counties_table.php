@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('postal_codes', function (Blueprint $table) {
+        Schema::create('counties', function (Blueprint $table) {
             $table->id();
-            $table->string('zip', 10)->index();
-            $table->string('city');
-            $table->foreignId('county_id')->constrained('counties')->onDelete('cascade');
+            $table->string('name')->unique();
             $table->timestamps();
-            $table->unique(['zip', 'city']);
         });
     }
 
@@ -26,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('postal_codes');
+        Schema::dropIfExists('counties');
     }
 };

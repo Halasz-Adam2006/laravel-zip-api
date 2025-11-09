@@ -3,6 +3,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\PostalCode;
+use App\Models\County;
 
 class ImportPostalCodes extends Command
 {
@@ -18,6 +19,13 @@ class ImportPostalCodes extends Command
             $this->error("File not found: $path");
             return;
         }
+        
+        // Clear existing data
+        $this->info("Clearing existing data...");
+        \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        PostalCode::truncate();
+        County::truncate();
+        \DB::statement('SET FOREIGN_KEY_CHECKS=1;');
         
         $total = max(0, count(file($path)) - 1);
 
@@ -42,10 +50,35 @@ class ImportPostalCodes extends Command
                 continue;
             }
 
+            // Find or create county
+            $countyName = $row['Megye'] ?? null;
+            
+            // If county is empty and city is Budapest, set county to Budapest
+            if (empty($countyName) && isset($row['Település']) && trim($row['Település']) === 'Budapest') {
+                $countyName = 'Budapest';
+            }
+            
+            if (empty($countyName)) {
+                $this->warn("Skipping row - no county: " . json_encode($row));
+                $bar->advance();
+                continue; // Skip rows without county
+            }
+            
+            // Trim and normalize county name
+            $countyName = trim($countyName);
+            
+            $county = County::firstOrCreate(['name' => $countyName]);
+            
+            if (!$county || !$county->id) {
+                $this->error("Failed to create/find county: " . $countyName);
+                $bar->advance();
+                continue;
+            }
+
             PostalCode::create([
-                'zip'    => $row['Irányítószám'],
-                'city'   => $row['Település'] ?? null,
-                'county' => $row['Megye'] ?? null,
+                'zip'        => $row['Irányítószám'],
+                'city'       => $row['Település'] ?? null,
+                'county_id'  => $county->id,
             ]);
 
             $bar->advance();
