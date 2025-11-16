@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostalCodeController;
+use App\Http\Controllers\CountyController;
 
 // Public routes - no authentication required
 Route::post('login', [\App\Http\Controllers\AuthController::class, 'login']);
@@ -37,5 +38,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('county/{county}', [PostalCodeController::class, 'showByCounty']);
     Route::put('county/{county}', [PostalCodeController::class, 'updateByCounty']);
     Route::delete('county/{county}', [PostalCodeController::class, 'destroyByCounty']);
+    
+    // County routes
+    Route::get('counties', [\App\Http\Controllers\CountyController::class, 'index']);
+    Route::post('counties', [\App\Http\Controllers\CountyController::class, 'store']);
+    Route::put('counties/{id}', [\App\Http\Controllers\CountyController::class, 'update']);
+    Route::delete('counties/{id}', [\App\Http\Controllers\CountyController::class, 'destroy']);
 });
 
