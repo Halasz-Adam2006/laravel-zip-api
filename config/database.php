@@ -2,6 +2,11 @@
 
 use Illuminate\Support\Str;
 
+// Prefer the new namespaced PDO MySQL constant to avoid PHP 8.5 deprecations.
+$mysqlSslCaAttr = defined('Pdo\\Mysql::ATTR_SSL_CA')
+    ? \Pdo\Mysql::ATTR_SSL_CA
+    : (defined('PDO::MYSQL_ATTR_SSL_CA') ? constant('PDO::MYSQL_ATTR_SSL_CA') : null);
+
 return [
 
     /*
@@ -58,8 +63,8 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            'options' => extension_loaded('pdo_mysql') && $mysqlSslCaAttr ? array_filter([
+                $mysqlSslCaAttr => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 
@@ -78,8 +83,8 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            'options' => extension_loaded('pdo_mysql') && $mysqlSslCaAttr ? array_filter([
+                $mysqlSslCaAttr => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
 

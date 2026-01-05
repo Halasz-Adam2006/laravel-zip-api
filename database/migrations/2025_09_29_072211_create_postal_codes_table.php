@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Keep existing table/data if already loaded from CSV.
+        if (Schema::hasTable('postal_codes')) {
+            return;
+        }
+
         Schema::create('postal_codes', function (Blueprint $table) {
             $table->id();
             $table->string('zip', 10)->index();

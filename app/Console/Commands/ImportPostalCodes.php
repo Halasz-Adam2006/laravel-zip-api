@@ -20,6 +20,7 @@ class ImportPostalCodes extends Command
             return;
         }
         
+        
         // Clear existing data
         $this->info("Clearing existing data...");
         \DB::statement('SET FOREIGN_KEY_CHECKS=0;');
@@ -32,7 +33,11 @@ class ImportPostalCodes extends Command
         $handle = fopen($path, 'r');
         $header = fgetcsv($handle, 1000, ',');
         $header = array_map(function($h) {
-            return trim($h, "\" \t\n\r\0\x0B");
+            $h = trim($h, "\" \t\n\r\0\x0B");
+            // If header contains an embedded newline (e.g. "Postal Code\nIrányítószám"),
+            // take the last line which contains the localized column name.
+            $parts = preg_split('/\r?\n/', $h);
+            return trim(end($parts));
         }, $header);
 
         $bar = $this->output->createProgressBar($total);
@@ -87,6 +92,7 @@ class ImportPostalCodes extends Command
         fclose($handle);
         $bar->finish();
         $this->newLine();
+        $this->info('Counts after import - counties: ' . County::count() . ', postal_codes: ' . PostalCode::count());
         $this->info('Import completed.');
     }
 }

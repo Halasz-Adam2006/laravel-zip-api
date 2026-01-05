@@ -1,4 +1,16 @@
 <?php return array (
+  'barryvdh/laravel-dompdf' => 
+  array (
+    'aliases' => 
+    array (
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+    ),
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\DomPDF\\ServiceProvider',
+    ),
+  ),
   'knuckleswtf/scribe' => 
   array (
     'providers' => 
@@ -64,13 +76,6 @@
     'providers' => 
     array (
       0 => 'Termwind\\Laravel\\TermwindServiceProvider',
-    ),
-  ),
-  'phiki/phiki' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Phiki\\Adapters\\Laravel\\PhikiServiceProvider',
     ),
   ),
 );

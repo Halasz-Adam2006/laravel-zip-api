@@ -10,8 +10,8 @@ Route::post('login', [\App\Http\Controllers\AuthController::class, 'login']);
 Route::post('register', [\App\Http\Controllers\AuthController::class, 'register']);
 
 // Protected routes - authentication required
-Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', function (Request $request) {
+//Route::middleware('auth:sanctum')->group(function () {
+   Route::get('/user', function (Request $request) {
         return $request->user();
     });
     
@@ -29,20 +29,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('id/{id}', [PostalCodeController::class, 'updateById']);
     Route::delete('id/{id}', [PostalCodeController::class, 'destroyById']);
     
-    // City-based routes
     Route::get('city/{city}', [PostalCodeController::class, 'showByCity']);
     Route::put('city/{city}', [PostalCodeController::class, 'updateByCity']);
     Route::delete('city/{city}', [PostalCodeController::class, 'destroyByCity']);
     
-    // County-based routes
     Route::get('county/{county}', [PostalCodeController::class, 'showByCounty']);
+    Route::get('county/{county}/{letter}', [PostalCodeController::class, 'showByLetter']);
+    Route::get('county/{county}/{letter}/export/pdf', [PostalCodeController::class, 'exportCitiesPdf']);
+    Route::get('county/{county}/{letter}/export/csv', [PostalCodeController::class, 'exportCitiesCsv']);
     Route::put('county/{county}', [PostalCodeController::class, 'updateByCounty']);
     Route::delete('county/{county}', [PostalCodeController::class, 'destroyByCounty']);
     
-    // County routes
-    Route::get('counties', [\App\Http\Controllers\CountyController::class, 'index']);
-    Route::post('counties', [\App\Http\Controllers\CountyController::class, 'store']);
-    Route::put('counties/{id}', [\App\Http\Controllers\CountyController::class, 'update']);
-    Route::delete('counties/{id}', [\App\Http\Controllers\CountyController::class, 'destroy']);
-});
+    Route::get('counties', [CountyController::class, 'index']);
+    Route::post('counties', [CountyController::class, 'store']);
+    Route::put('counties/{id}', [CountyController::class, 'update']);
+    Route::delete('counties/{id}', [CountyController::class, 'destroy']);
+
+    
+//})
+;
 

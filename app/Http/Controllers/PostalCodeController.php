@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\PostalCode;
 use App\Models\County;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class PostalCodeController extends Controller
 {
@@ -468,6 +469,28 @@ class PostalCodeController extends Controller
     }
 
     /**
+     * @group Postal Codes - County
+     * @authenticated
+     * @urlParam county string required
+     * @urlParam letter string required
+     */
+    public function showByLetter(string $county, string $letter)
+    {
+        $countyModel = County::whereRaw('LOWER(name) = ?', [strtolower($county)])->first();
+        
+        if (!$countyModel) {
+            return response()->json([]);
+        }
+
+        $postalCodes = PostalCode::with('county')
+            ->where('county_id', $countyModel->id)
+            ->whereRaw('LOWER(city) LIKE ?', [strtolower($letter) . '%'])
+            ->get();
+
+        return response()->json($postalCodes);
+    }
+
+    /**
      * Delete postal codes by county.
      *
      * Deletes all postal codes for a given county name.
@@ -558,6 +581,15 @@ class PostalCodeController extends Controller
             if (isset($validated['zip'])) {
                 $postalCode->zip = $validated['zip'];
             }
+    /**
+     * Export cities by county and starting letter as PDF.
+     *
+     * @group Postal Codes - Export
+     * @urlParam name string required The county name. Example: Pest
+     * @urlParam letter string required The starting letter. Example: C
+     * @response 200 scenario="PDF file download"
+     * @response 404 {"error": "County not found"}
+     */
             if (isset($validated['city'])) {
                 $postalCode->city = $validated['city'];
             }
@@ -567,5 +599,62 @@ class PostalCodeController extends Controller
         $targetCountyId = $newCountyId ?? $countyModel->id;
         $updated = PostalCode::with('county')->where('county_id', $targetCountyId)->get();
         return response()->json($updated);
+    }
+
+    /**
+     * @group Postal Codes - Export
+     * @urlParam name string required
+     * @urlParam letter string required
+     */
+    public function exportCitiesPdf($name, $letter)
+    {
+        $letter = strtoupper($letter);
+        
+        $county = County::where('name', $name)->first();
+        if (!$county) {
+            return response()->json(['error' => 'County not found'], 404);
+        }
+        
+        $cities = $county->postalCodes()
+            ->where('city', 'LIKE', $letter.'%')
+            ->orderBy('city')
+            ->get();
+        
+        $pdf = Pdf::loadView('pdf.cities', [
+            'county' => $county,
+            'letter' => $letter,
+            'cities' => $cities
+        ]);
+        
+        return $pdf->download("cities_{$name}_{$letter}.pdf");
+    }
+
+    /**
+     * @group Postal Codes - Export
+     * @urlParam name string required
+     * @urlParam letter string required
+     */
+    public function exportCitiesCsv($name, $letter)
+    {
+        $letter = strtoupper($letter);
+        
+        $county = County::where('name', $name)->first();
+        if (!$county) {
+            return response()->json(['error' => 'County not found'], 404);
+        }
+        
+        $cities = $county->postalCodes()
+            ->where('city', 'LIKE', $letter.'%')
+            ->orderBy('city')
+            ->get();
+        
+        $csv = "ID,Irányítószám,Város,Megye\n";
+        foreach ($cities as $city) {
+            $csv .= "{$city->id},{$city->zip},{$city->city},{$city->county->name}\n";
+        }
+        
+        return response($csv)
+            ->header('Content-Type', 'text/csv; charset=utf-8')
+            ->header('Content-Disposition', "attachment; filename=\"cities_{$name}_{$letter}.csv\"");
     }
 }

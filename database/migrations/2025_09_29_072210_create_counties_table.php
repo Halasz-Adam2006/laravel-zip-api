@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        
-        Schema::dropIfExists('counties');
+        // If the table already exists (preloaded data), keep it and mark the migration as run.
+        if (Schema::hasTable('counties')) {
+            return;
+        }
 
         Schema::create('counties', function (Blueprint $table) {
             $table->id();
