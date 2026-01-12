@@ -1,26 +1,20 @@
 <?php
 
 use App\Models\County;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Tests\TestCase;
 
 class CountyControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithoutMiddleware;
 
     public function test_index_returns_all_counties()
     {
         County::factory()->create(['name' => 'Pest']);
         County::factory()->create(['name' => 'Baranya']);
 
-        // authenticate
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/counties');
+        $response = $this->getJson('/api/counties');
 
         $response->assertStatus(200)
             ->assertJsonFragment(['name' => 'Pest'])
@@ -32,13 +26,7 @@ class CountyControllerTest extends TestCase
         County::factory()->create(['name' => 'Bács-Kiskun']);
         County::factory()->create(['name' => 'Baranya']);
 
-        // authenticate
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->getJson('/api/counties?needle=bar');
+        $response = $this->getJson('/api/counties?needle=bar');
 
         $response->assertStatus(200)
             ->assertJsonFragment(['name' => 'Baranya'])
@@ -47,12 +35,7 @@ class CountyControllerTest extends TestCase
 
     public function test_store_creates_new_county()
     {
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->postJson('/api/counties', [
+        $response = $this->postJson('/api/counties', [
             'name' => 'Somogy'
         ]);
 
@@ -66,12 +49,7 @@ class CountyControllerTest extends TestCase
     {
         $county = County::factory()->create(['name' => 'Heves']);
 
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->putJson("/api/counties/{$county->id}", [
+        $response = $this->putJson("/api/counties/{$county->id}", [
             'name' => 'Nógrád'
         ]);
 
@@ -83,13 +61,7 @@ class CountyControllerTest extends TestCase
 
     public function test_update_returns_404_for_missing_county()
     {
-        // authenticate
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->putJson('/api/counties/999', [
+        $response = $this->putJson('/api/counties/999', [
             'name' => 'Tolna'
         ]);
 
@@ -101,13 +73,7 @@ class CountyControllerTest extends TestCase
     {
         $county = County::factory()->create(['name' => 'Vas']);
 
-        // authenticate
-        $user = User::factory()->create();
-        $token = $user->createToken('TestToken')->plainTextToken;
-
-        $response = $this->withHeaders([
-            'Authorization' => 'Bearer ' . $token,
-        ])->deleteJson("/api/counties/{$county->id}");
+        $response = $this->deleteJson("/api/counties/{$county->id}");
 
         $response->assertStatus(410)
             ->assertJsonFragment(['message' => 'Deleted']);

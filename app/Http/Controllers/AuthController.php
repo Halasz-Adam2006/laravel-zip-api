@@ -67,7 +67,7 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|email|unique:users',
             'password' => 'required',
         ]);
 
