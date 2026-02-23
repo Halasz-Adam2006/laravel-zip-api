@@ -2,76 +2,159 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\County;
+use App\Mail\AlphabetExportMail;
+use App\Models\PostalCode;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\View\View;
 
 class CountyController extends Controller
 {
-    /**
-     * Fetch all counties without cities.
-     *
-     * @return JsonResponse
-     */
-    public function index(Request $request): JsonResponse
+    public function index(): View
     {
-        $needle = $request->query('needle');
-
-        $query = County::query();
-        if ($needle) {
-            $needle = mb_strtolower($needle);
-            $query->whereRaw('LOWER(name) LIKE ?', ["%{$needle}%"]);
-        }
-
-        $counties = $query->get(['id', 'name']);
-        return response()->json($counties);
+        return view('counties.index');
     }
 
-    /**
-     * Store a new county.
-     */
-    public function store(Request $request): JsonResponse
+    public function showAlphabet(string $name): View
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:counties,name',
+        $county = (object) ['name' => $name];
+
+        return view('counties.alphabet', compact('county'));
+    }
+
+    public function showCounties(): JsonResponse
+    {
+        $counties = PostalCode::query()
+            ->select('county')
+            ->whereNotNull('county')
+            ->distinct()
+            ->orderBy('county')
+            ->pluck('county')
+            ->values();
+
+        $payload = $counties->map(function ($county, $index) {
+            return [
+                'id' => $index + 1,
+                'name' => $county,
+            ];
+        });
+
+        return response()->json($payload);
+    }
+
+    public function getCitiesByLetter(string $name, string $letter): JsonResponse
+    {
+        $cities = $this->getAlphabetCities($name, $letter);
+
+        if ($cities === null) {
+            return response()->json(['error' => 'Invalid letter parameter'], 400);
+        }
+
+        return response()->json($cities->map(fn($city) => ['city' => $city]));
+    }
+
+    public function exportAlphabetCsv(string $name, string $letter)
+    {
+        $cities = $this->getAlphabetCities($name, $letter);
+
+        if ($cities === null) {
+            return response()->json(['error' => 'Invalid letter parameter'], 400);
+        }
+
+        $filename = sprintf('alphabet-%s-%s.csv', str_replace(' ', '-', strtolower($name)), strtolower($letter));
+        $csv = $this->buildAlphabetCsv($name, $letter, $cities);
+
+        return response($csv, 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+        ]);
+    }
+
+    public function exportAlphabetPdf(string $name, string $letter)
+    {
+        $cities = $this->getAlphabetCities($name, $letter);
+
+        if ($cities === null) {
+            return response()->json(['error' => 'Invalid letter parameter'], 400);
+        }
+
+        $pdf = Pdf::loadView('exports.alphabet-pdf', [
+            'county' => $name,
+            'letter' => strtoupper($letter),
+            'cities' => $cities,
         ]);
 
-        $county = County::create(['name' => $validated['name']]);
+        $filename = sprintf('alphabet-%s-%s.pdf', str_replace(' ', '-', strtolower($name)), strtolower($letter));
 
-        return response()->json($county, 201);
+        return $pdf->download($filename);
     }
 
-    /**
-     * Update a county by id.
-     */
-    public function update(Request $request, int $id): JsonResponse
+    public function exportAlphabetEmail(Request $request, string $name, string $letter): JsonResponse
     {
-        $county = County::find($id);
-        if (!$county) {
-            return response()->json(['message' => 'Not found!'], 404);
+        $cities = $this->getAlphabetCities($name, $letter);
+
+        if ($cities === null) {
+            return response()->json(['error' => 'Invalid letter parameter'], 400);
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|unique:counties,name,' . $id,
+            'email' => ['nullable', 'email'],
         ]);
 
-        $county->name = $validated['name'];
-        $county->save();
+        $recipient = $validated['email'] ?? $request->user()?->email;
 
-        return response()->json($county);
-    }
-
-    /**
-     * Delete a county by id.
-     */
-    public function destroy(int $id): JsonResponse
-    {
-        $county = County::find($id);
-        if (!$county) {
-            return response()->json(['message' => 'Not found!'], 404);
+        if (!$recipient) {
+            return response()->json(['error' => 'No recipient email available.'], 422);
         }
 
-        $county->delete();
-        return response()->json(['message' => 'Deleted'], 410);
+        $csv = $this->buildAlphabetCsv($name, $letter, $cities);
+
+        Mail::to($recipient)->send(new AlphabetExportMail(
+            county: $name,
+            letter: strtoupper($letter),
+            cities: $cities->all(),
+            csv: $csv,
+        ));
+
+        return response()->json([
+            'message' => 'Export email sent successfully.',
+        ]);
+    }
+
+    private function getAlphabetCities(string $name, string $letter): ?Collection
+    {
+        $letter = trim($letter);
+
+        if (!preg_match('/^[A-Za-z]$/', $letter)) {
+            return null;
+        }
+
+        return PostalCode::query()
+            ->where('county', $name)
+            ->where('place_name', 'like', $letter . '%')
+            ->select('place_name')
+            ->distinct()
+            ->orderBy('place_name')
+            ->pluck('place_name')
+            ->values();
+    }
+
+    private function buildAlphabetCsv(string $name, string $letter, Collection $cities): string
+    {
+        $stream = fopen('php://temp', 'r+');
+        fputcsv($stream, ['County', 'Letter', 'City']);
+
+        foreach ($cities as $city) {
+            fputcsv($stream, [$name, strtoupper($letter), $city]);
+        }
+
+        rewind($stream);
+        $csv = stream_get_contents($stream);
+        fclose($stream);
+
+        return $csv;
     }
 }

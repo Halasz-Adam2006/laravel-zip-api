@@ -1,81 +1,81 @@
-<?php return array(
-  'barryvdh/laravel-dompdf' =>
-    array(
-      'aliases' =>
-        array(
-          'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-          'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-        ),
-      'providers' =>
-        array(
-          0 => 'Barryvdh\\DomPDF\\ServiceProvider',
-        ),
+<?php return array (
+  'barryvdh/laravel-dompdf' => 
+  array (
+    'aliases' => 
+    array (
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
     ),
-  'knuckleswtf/scribe' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Knuckles\\Scribe\\ScribeServiceProvider',
-        ),
+    'providers' => 
+    array (
+      0 => 'Barryvdh\\DomPDF\\ServiceProvider',
     ),
-  'laravel/pail' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Laravel\\Pail\\PailServiceProvider',
-        ),
+  ),
+  'knuckleswtf/scribe' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Knuckles\\Scribe\\ScribeServiceProvider',
     ),
-  'laravel/sail' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Laravel\\Sail\\SailServiceProvider',
-        ),
+  ),
+  'laravel/pail' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Pail\\PailServiceProvider',
     ),
-  'laravel/sanctum' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Laravel\\Sanctum\\SanctumServiceProvider',
-        ),
+  ),
+  'laravel/sail' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Sail\\SailServiceProvider',
     ),
-  'laravel/tinker' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Laravel\\Tinker\\TinkerServiceProvider',
-        ),
+  ),
+  'laravel/sanctum' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Sanctum\\SanctumServiceProvider',
     ),
-  'maatwebsite/excel' =>
-    array(
-      'aliases' =>
-        array(
-          'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
-        ),
-      'providers' =>
-        array(
-          0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
-        ),
+  ),
+  'laravel/tinker' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Laravel\\Tinker\\TinkerServiceProvider',
     ),
-  'nesbot/carbon' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Carbon\\Laravel\\ServiceProvider',
-        ),
+  ),
+  'maatwebsite/excel' => 
+  array (
+    'aliases' => 
+    array (
+      'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
     ),
-  'nunomaduro/collision' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
-        ),
+    'providers' => 
+    array (
+      0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
     ),
-  'nunomaduro/termwind' =>
-    array(
-      'providers' =>
-        array(
-          0 => 'Termwind\\Laravel\\TermwindServiceProvider',
-        ),
+  ),
+  'nesbot/carbon' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Carbon\\Laravel\\ServiceProvider',
     ),
+  ),
+  'nunomaduro/collision' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'NunoMaduro\\Collision\\Adapters\\Laravel\\CollisionServiceProvider',
+    ),
+  ),
+  'nunomaduro/termwind' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Termwind\\Laravel\\TermwindServiceProvider',
+    ),
+  ),
 );
